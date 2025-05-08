@@ -15,12 +15,17 @@
       background-color: #f0f0f0;
     }
     .container {
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 30px;
     }
     button {
       width: 200px;
       height: 50px;
-      margin: 10px;
+      margin: 10px 0;
       font-size: 20px;
       border: none;
       cursor: pointer;
@@ -44,9 +49,14 @@
 </head>
 <body>
   <div class="container">
-    <button id="onOffBtn">ON</button>
+    <h1>Control Wall-E</h1>
+    <h1>---------------------</h1>
     <button id="avanzarBtn">Avanzar</button>
+    <button id="onOffBtn">ON</button>
     <button id="retrocederBtn">Retroceder</button>
+    <h1>---------------------</h1>
+  <h1>3er Semestre Iot y Robotica</h1>
+  <h1>2025</h1>
   </div>
 
   <script type="module">
@@ -70,15 +80,44 @@
     const avanzarBtn = document.getElementById("avanzarBtn");
     const retrocederBtn = document.getElementById("retrocederBtn");
 
+    // ON/OFF
     onOffBtn.addEventListener('click', () => {
       const newState = onOffBtn.textContent === "ON";
       set(ref(db, 'robot/state'), newState);
     });
 
-    avanzarBtn.addEventListener('mousedown', () => set(ref(db, 'robot/movement'), 'avanzar'));
-    avanzarBtn.addEventListener('mouseup', () => set(ref(db, 'robot/movement'), 'detener'));
-    retrocederBtn.addEventListener('mousedown', () => set(ref(db, 'robot/movement'), 'retroceder'));
-    retrocederBtn.addEventListener('mouseup', () => set(ref(db, 'robot/movement'), 'detener'));
+    // Funciones de movimiento
+    function activarMovimiento(direccion) {
+      set(ref(db, 'robot/movement'), direccion);
+    }
+
+    function detenerMovimiento() {
+      set(ref(db, 'robot/movement'), 'detener');
+    }
+
+    // Avanzar
+    avanzarBtn.addEventListener('mousedown', () => activarMovimiento('avanzar'));
+    avanzarBtn.addEventListener('mouseup', detenerMovimiento);
+    avanzarBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      activarMovimiento('avanzar');
+    });
+    avanzarBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      detenerMovimiento();
+    });
+
+    // Retroceder
+    retrocederBtn.addEventListener('mousedown', () => activarMovimiento('retroceder'));
+    retrocederBtn.addEventListener('mouseup', detenerMovimiento);
+    retrocederBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      activarMovimiento('retroceder');
+    });
+    retrocederBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      detenerMovimiento();
+    });
 
     // Estado en tiempo real
     onValue(ref(db, 'robot/state'), (snapshot) => {
